@@ -2,8 +2,6 @@ package com.example.archimvp.view;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -11,6 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.archimvp.R;
+import com.example.archimvp.base.BaseActivity;
 import com.example.archimvp.model.Repository;
 import com.example.archimvp.model.User;
 import com.example.archimvp.presenter.RepositoryPresenter;
@@ -18,10 +17,9 @@ import com.example.archimvp.presenter.contract.RepositoryContract;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class RepositoryActivity extends AppCompatActivity implements RepositoryContract.View{
+public class RepositoryActivity extends BaseActivity<RepositoryPresenter> implements RepositoryContract.View {
 
     private static final String EXTRA_REPOSITORY = "EXTRA_REPOSITORY";
     private static final String TAG = "RepositoryActivity";
@@ -48,7 +46,6 @@ public class RepositoryActivity extends AppCompatActivity implements RepositoryC
     @BindView(R.id.layout_owner)
     RelativeLayout layoutOwner;
 
-    private RepositoryContract.Presenter mPresenter;
     public static void startActivity(Context context, Repository repository) {
         Intent intent = new Intent(context, RepositoryActivity.class);
         intent.putExtra(EXTRA_REPOSITORY, repository);
@@ -56,25 +53,24 @@ public class RepositoryActivity extends AppCompatActivity implements RepositoryC
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_repository);
-        ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
-        if (mPresenter == null) {
-            mPresenter = new RepositoryPresenter();
-        }
-        mPresenter.attachView(this);
-        Repository repository = getIntent().getParcelableExtra(EXTRA_REPOSITORY);
-        mPresenter.bindRepositoryInfo(repository);
-        mPresenter.loadUserInfo(repository.owner.url);
+    protected int getLayout() {
+        return R.layout.activity_repository;
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mPresenter.detachView();
-        mPresenter = null;
+    protected void initInject() {
+        if (mPresenter == null) {
+            mPresenter = new RepositoryPresenter();
+        }
+
+    }
+
+    @Override
+    protected void initEventAndData() {
+        setSupportActionBar(toolbar);
+        Repository repository = getIntent().getParcelableExtra(EXTRA_REPOSITORY);
+        mPresenter.bindRepositoryInfo(repository);
+        mPresenter.loadUserInfo(repository.owner.url);
     }
 
 
@@ -114,7 +110,7 @@ public class RepositoryActivity extends AppCompatActivity implements RepositoryC
     }
 
     @Override
-    public void setPresenter(RepositoryContract.Presenter presenter) {
-        mPresenter = presenter;
+    public void showErrorMsg(String msg) {
+
     }
 }

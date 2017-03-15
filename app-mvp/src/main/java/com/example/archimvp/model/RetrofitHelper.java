@@ -9,12 +9,28 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class RetrofitHelper {
-    public static GitHubService create(){
+
+    private RetrofitHelper(){
+    }
+
+    private static class RetrofitHelperHolder{
+        private static final RetrofitHelper sInstance = new RetrofitHelper();
+    }
+
+    public static RetrofitHelper shareInstance(){
+        return RetrofitHelperHolder.sInstance;
+    }
+
+    public  GitHubService createGithubService(){
+        return createRetrofit("https://api.github.com/").create(GitHubService.class);
+    }
+
+    private Retrofit createRetrofit(String url){
         return new Retrofit.Builder()
-                .baseUrl("https://api.github.com/")
+                .baseUrl(url)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .build().create(GitHubService.class);
-
+                .build();
     }
+
 }

@@ -1,17 +1,12 @@
 package com.example.archimvp.view;
 
 import android.content.Context;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -22,20 +17,22 @@ import android.widget.TextView;
 
 import com.example.archimvp.R;
 import com.example.archimvp.adapter.RepositoryAdapter;
+import com.example.archimvp.base.BaseFragment;
+import com.example.archimvp.common.RxBus;
 import com.example.archimvp.model.Repository;
+import com.example.archimvp.presenter.MainPresenter;
 import com.example.archimvp.presenter.contract.MainContract;
 
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
  * Created by LeoPoldCrossing on 2017/3/14.
  */
 
-public class MainFragment extends Fragment implements MainContract.View {
+public class MainFragment extends BaseFragment<MainPresenter> implements MainContract.View {
 
     @BindView(R.id.button_search)
     ImageButton buttonSearch;
@@ -50,58 +47,37 @@ public class MainFragment extends Fragment implements MainContract.View {
     @BindView(R.id.repos_recycler_view)
     RecyclerView reposRecyclerView;
 
-    private MainContract.Presenter mPresenter;
-
-    public MainFragment() {
-
-    }
-
     public static MainFragment newInstance() {
         return new MainFragment();
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    protected int getLayoutId() {
+        return R.layout.fragment_main;
     }
 
     @Override
-    public void setPresenter(MainContract.Presenter presenter) {
-        mPresenter = presenter;
+    protected void initInject() {
+        mPresenter = new MainPresenter();
     }
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View inflate = inflater.inflate(R.layout.fragment_main, container, false);
-        ButterKnife.bind(this, inflate);
-        injectView();
-        return inflate;
-    }
-
-    private void injectView() {
+    protected void initEventAndData() {
         setupRecyclerView(reposRecyclerView);
-
         editTextUsername.addTextChangedListener(mHideShowButtonTextWatcher);
-
         // 该监听器在点击键盘的回车键时触发
         editTextUsername.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     String username = editTextUsername.getText().toString();
-                    if (username.length() > 0) mPresenter.loadGithubRepos(username);
+                    if (username.length() > 0)
+                        RxBus.getDefault().post(username);
                     return true;
                 }
                 return false;
             }
         });
-    }
-
-    @Override
-    public void onDestroyView() {
-        mPresenter.detachView();
-        super.onDestroyView();
     }
 
     private void setupRecyclerView(RecyclerView reposRecyclerView) {
@@ -141,11 +117,6 @@ public class MainFragment extends Fragment implements MainContract.View {
         reposRecyclerView.setVisibility(View.INVISIBLE);
     }
 
-    private void hideSoftKeyboard() {
-        InputMethodManager imm = (InputMethodManager) this.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(editTextUsername.getWindowToken(), 0);
-    }
-
     @Override
     public void showRepostories(List<Repository> repositories) {
         RepositoryAdapter adapter = (RepositoryAdapter) reposRecyclerView.getAdapter();
@@ -167,6 +138,17 @@ public class MainFragment extends Fragment implements MainContract.View {
 
     @OnClick(R.id.button_search)
     public void searchClick() {
-        mPresenter.loadGithubRepos(editTextUsername.getText().toString());
+        RxBus.getDefault().post(editTextUsername.getText().toString());
     }
+
+    @Override
+    public void showErrorMsg(String msg) {
+
+    }
+
+    private void hideSoftKeyboard() {
+        InputMethodManager imm = (InputMethodManager) this.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(editTextUsername.getWindowToken(), 0);
+    }
+
 }

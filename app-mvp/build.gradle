@@ -34,5 +34,8 @@ dependencies {
     compile dependencies.rxjava
     compile dependencies.circleImageView
     compile dependencies.butterknife
+    compile dependencies.fragmentation
+    compile dependencies.rxpermission
     apt dependencies.apt
+
 }

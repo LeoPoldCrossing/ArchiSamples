@@ -10,13 +10,13 @@ import com.example.archimvp.model.User;
  */
 
 public class RepositoryContract {
-    public interface View extends BaseView<RepositoryContract.Presenter> {
+    public interface View extends BaseView {
         void showRepositoryInfo(Repository repository);
 
         void showUserInfo(User user);
     }
 
-    public interface Presenter extends BasePresenter<RepositoryContract.View>{
+    public interface Presenter extends BasePresenter<View>{
         void bindRepositoryInfo(Repository repository);
 
         void loadUserInfo(String userInfoUrl);

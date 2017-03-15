@@ -17,6 +17,8 @@ ext {
             mockito: 'org.mockito:mockito-core:1.10.19',
             robolectric: 'org.robolectric:robolectric:3.0',
             butterknife: 'com.jakewharton:butterknife:8.2.1',
-            apt:'com.jakewharton:butterknife-compiler:8.2.1'
+            apt:'com.jakewharton:butterknife-compiler:8.2.1',
+            fragmentation:'me.yokeyword:fragmentation:0.7.9',
+            rxpermission:'com.tbruyelle.rxpermissions:rxpermissions:0.9.1@aar'
     ]
 }

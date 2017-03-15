@@ -11,7 +11,7 @@ import java.util.List;
  */
 
 public class MainContract {
-    public interface View extends BaseView<Presenter>{
+    public interface View extends BaseView{
         void showProgressIndicator();
 
         void showRepostories(List<Repository> repositories);
