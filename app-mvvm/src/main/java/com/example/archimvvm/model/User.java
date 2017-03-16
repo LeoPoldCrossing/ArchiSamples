@@ -1,4 +1,4 @@
-package uk.ivanc.archimvvm.model;
+package com.example.archimvvm.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

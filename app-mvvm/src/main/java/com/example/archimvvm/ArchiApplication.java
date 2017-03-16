@@ -1,11 +1,12 @@
-package uk.ivanc.archimvvm;
+package com.example.archimvvm;
 
 import android.app.Application;
 import android.content.Context;
 
+import com.example.archimvvm.model.GithubService;
+
 import rx.Scheduler;
 import rx.schedulers.Schedulers;
-import uk.ivanc.archimvvm.model.GithubService;
 
 public class ArchiApplication extends Application {
 

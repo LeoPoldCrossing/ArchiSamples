@@ -1,4 +1,4 @@
-package uk.ivanc.archimvvm.view;
+package com.example.archimvvm.view;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,10 +7,11 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
-import uk.ivanc.archimvvm.R;
-import uk.ivanc.archimvvm.databinding.RepositoryActivityBinding;
-import uk.ivanc.archimvvm.model.Repository;
-import uk.ivanc.archimvvm.viewmodel.RepositoryViewModel;
+import com.example.archimvvm.R;
+import com.example.archimvvm.databinding.RepositoryActivityBinding;
+import com.example.archimvvm.model.Repository;
+import com.example.archimvvm.viewmodel.RepositoryViewModel;
+
 
 public class RepositoryActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package uk.ivanc.archimvvm.viewmodel;
+package com.example.archimvvm.viewmodel;
 
 /**
  * Interface that every ViewModel must implement

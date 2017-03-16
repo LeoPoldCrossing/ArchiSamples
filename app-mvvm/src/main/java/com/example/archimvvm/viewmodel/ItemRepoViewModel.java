@@ -1,12 +1,13 @@
-package uk.ivanc.archimvvm.viewmodel;
+package com.example.archimvvm.viewmodel;
 
 import android.content.Context;
 import android.databinding.BaseObservable;
 import android.view.View;
 
-import uk.ivanc.archimvvm.R;
-import uk.ivanc.archimvvm.model.Repository;
-import uk.ivanc.archimvvm.view.RepositoryActivity;
+import com.example.archimvvm.R;
+import com.example.archimvvm.model.Repository;
+import com.example.archimvvm.view.RepositoryActivity;
+
 
 /**
  * View model for each item in the repositories RecyclerView

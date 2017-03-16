@@ -1,4 +1,4 @@
-package uk.ivanc.archimvvm.viewmodel;
+package com.example.archimvvm.viewmodel;
 
 import android.content.Context;
 import android.databinding.BindingAdapter;
@@ -8,16 +8,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.example.archimvvm.ArchiApplication;
+import com.example.archimvvm.R;
+import com.example.archimvvm.model.GithubService;
+import com.example.archimvvm.model.Repository;
+import com.example.archimvvm.model.User;
 import com.squareup.picasso.Picasso;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import uk.ivanc.archimvvm.ArchiApplication;
-import uk.ivanc.archimvvm.R;
-import uk.ivanc.archimvvm.model.GithubService;
-import uk.ivanc.archimvvm.model.Repository;
-import uk.ivanc.archimvvm.model.User;
 
 /**
  * ViewModel for the RepositoryActivity

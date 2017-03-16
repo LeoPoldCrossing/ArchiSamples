@@ -1,4 +1,4 @@
-package uk.ivanc.archimvvm.model;
+package com.example.archimvvm.model;
 
 import java.util.List;
 

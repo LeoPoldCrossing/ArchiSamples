@@ -1,16 +1,18 @@
-package uk.ivanc.archimvvm;
+package com.example.archimvvm;
 
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import com.example.archimvvm.model.Repository;
+
 import java.util.Collections;
 import java.util.List;
 
-import uk.ivanc.archimvvm.databinding.ItemRepoBinding;
-import uk.ivanc.archimvvm.model.Repository;
-import uk.ivanc.archimvvm.viewmodel.ItemRepoViewModel;
+import com.example.archimvvm.databinding.ItemRepoBinding;
+import com.example.archimvvm.viewmodel.ItemRepoViewModel;
+
 
 public class RepositoryAdapter extends RecyclerView.Adapter<RepositoryAdapter.RepositoryViewHolder> {
 

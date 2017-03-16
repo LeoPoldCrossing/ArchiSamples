@@ -1,4 +1,4 @@
-package uk.ivanc.archimvvm.view;
+package com.example.archimvvm.view;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
@@ -8,13 +8,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.inputmethod.InputMethodManager;
 
+import com.example.archimvvm.R;
+import com.example.archimvvm.RepositoryAdapter;
+import com.example.archimvvm.databinding.MainActivityBinding;
+import com.example.archimvvm.model.Repository;
+import com.example.archimvvm.viewmodel.MainViewModel;
+
 import java.util.List;
 
-import uk.ivanc.archimvvm.R;
-import uk.ivanc.archimvvm.RepositoryAdapter;
-import uk.ivanc.archimvvm.databinding.MainActivityBinding;
-import uk.ivanc.archimvvm.model.Repository;
-import uk.ivanc.archimvvm.viewmodel.MainViewModel;
 
 public class MainActivity extends AppCompatActivity implements MainViewModel.DataListener {
 
