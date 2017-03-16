@@ -35,11 +35,6 @@ public class RepositoryPresenter implements RepositoryContract.Presenter {
     }
 
     @Override
-    public void bindRepositoryInfo(Repository repository) {
-        mView.showRepositoryInfo(repository);
-    }
-
-    @Override
     public void loadUserInfo(String userUrl) {
         ArchiApplication application = ArchiApplication.getApplication(mView.getContext());
         GitHubService gitHubService = application.getGitHubService();

@@ -1,6 +1,8 @@
 package com.example.archimvp.adapter;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,7 +12,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.archimvp.R;
+import com.example.archimvp.databinding.ItemRepoBinding;
 import com.example.archimvp.model.Repository;
+import com.example.archimvp.viewmodel.RepoItemViewModel;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +29,6 @@ import butterknife.ButterKnife;
 public class RepositoryAdapter extends RecyclerView.Adapter<RepositoryAdapter.RepositoryViewHolder> {
 
     private List<Repository> mList;
-    private OnItemClickListener onItemClickListener;
 
     public RepositoryAdapter() {
         mList = Collections.emptyList();
@@ -40,39 +43,19 @@ public class RepositoryAdapter extends RecyclerView.Adapter<RepositoryAdapter.Re
         this.notifyDataSetChanged();
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.onItemClickListener = listener;
-    }
-
     @Override
     public RepositoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_repo, parent, false);
-        return new RepositoryViewHolder(itemView);
+        ItemRepoBinding binding = DataBindingUtil.inflate(
+                LayoutInflater.from(parent.getContext()),
+                R.layout.item_repo,
+                parent,
+                false);
+        return new RepositoryViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(final RepositoryViewHolder holder, int position) {
-        holder.repository = mList.get(position);
-        Context context = holder.textRepoTitle.getContext();
-
-        holder.textRepoTitle.setText(holder.repository.name);
-        holder.textRepoDescription.setText(holder.repository.description);
-
-        holder.textWatchers.setText(
-                context.getResources().getString(R.string.text_watchers, holder.repository.watchers));
-        holder.textStars.setText(
-                context.getResources().getString(R.string.text_stars, holder.repository.stars));
-        holder.textForks.setText(
-                context.getString(R.string.text_forks, holder.repository.forks));
-
-        holder.layoutContent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (onItemClickListener != null) {
-                    onItemClickListener.onItemClick(holder.repository);
-                }
-            }
-        });
+        holder.bindRepository(mList.get(position));
     }
 
     @Override
@@ -80,31 +63,23 @@ public class RepositoryAdapter extends RecyclerView.Adapter<RepositoryAdapter.Re
         return mList.size();
     }
 
+
     public static class RepositoryViewHolder extends RecyclerView.ViewHolder {
-        public Repository repository;
+        final ItemRepoBinding binding;
 
-        @BindView(R.id.text_repo_title)
-        TextView textRepoTitle;
-        @BindView(R.id.text_repo_description)
-        TextView textRepoDescription;
-        @BindView(R.id.text_watchers)
-        TextView textWatchers;
-        @BindView(R.id.text_stars)
-        TextView textStars;
-        @BindView(R.id.text_forks)
-        TextView textForks;
-        @BindView(R.id.layout_content)
-        LinearLayout layoutContent;
-        @BindView(R.id.card_view)
-        CardView cardView;
+        public RepositoryViewHolder(ItemRepoBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
 
-        public RepositoryViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
+        void bindRepository(Repository repository) {
+            if (binding.getItemViewModel() == null) {
+                binding.setItemViewModel(new RepoItemViewModel(itemView.getContext(), repository));
+            } else {
+                binding.getItemViewModel().setRepository(repository);
+            }
         }
     }
-
-    public interface OnItemClickListener {
-        void onItemClick(Repository repository);
-    }
 }
+
+

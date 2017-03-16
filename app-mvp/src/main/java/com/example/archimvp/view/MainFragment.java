@@ -6,30 +6,18 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import com.example.archimvp.R;
 import com.example.archimvp.adapter.RepositoryAdapter;
+import com.example.archimvp.databinding.FragmentMainBinding;
 import com.example.archimvp.model.Repository;
 import com.example.archimvp.presenter.contract.MainContract;
+import com.example.archimvp.viewmodel.MainViewModel;
 
 import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 /**
  * Created by LeoPoldCrossing on 2017/3/14.
@@ -37,32 +25,14 @@ import butterknife.OnClick;
 
 public class MainFragment extends Fragment implements MainContract.View {
 
-    @BindView(R.id.button_search)
-    ImageButton buttonSearch;
-    @BindView(R.id.edit_text_username)
-    EditText editTextUsername;
-    @BindView(R.id.layout_search)
-    RelativeLayout layoutSearch;
-    @BindView(R.id.progress)
-    ProgressBar progress;
-    @BindView(R.id.text_info)
-    TextView textInfo;
-    @BindView(R.id.repos_recycler_view)
-    RecyclerView reposRecyclerView;
-
     private MainContract.Presenter mPresenter;
 
-    public MainFragment() {
+    private MainViewModel mainViewModel;
 
-    }
+    private FragmentMainBinding fragmentMainBinding;
 
     public static MainFragment newInstance() {
         return new MainFragment();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     @Override
@@ -70,32 +40,47 @@ public class MainFragment extends Fragment implements MainContract.View {
         mPresenter = presenter;
     }
 
+    public void setViewModel(MainViewModel viewModel) {
+        mainViewModel = viewModel;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View inflate = inflater.inflate(R.layout.fragment_main, container, false);
-        ButterKnife.bind(this, inflate);
-        injectView();
-        return inflate;
+        fragmentMainBinding = FragmentMainBinding.inflate(inflater, container, false);
+        fragmentMainBinding.setViewModel(mainViewModel);
+        setupRecyclerView(fragmentMainBinding.reposRecyclerView);
+        return fragmentMainBinding.getRoot();
     }
 
-    private void injectView() {
-        setupRecyclerView(reposRecyclerView);
+    private void setupRecyclerView(RecyclerView reposRecyclerView) {
+        RepositoryAdapter adapter = new RepositoryAdapter();
+        reposRecyclerView.setAdapter(adapter);
+        reposRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+    }
 
-        editTextUsername.addTextChangedListener(mHideShowButtonTextWatcher);
 
-        // 该监听器在点击键盘的回车键时触发
-        editTextUsername.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    String username = editTextUsername.getText().toString();
-                    if (username.length() > 0) mPresenter.loadGithubRepos(username);
-                    return true;
-                }
-                return false;
-            }
-        });
+    private void hideSoftKeyboard() {
+        InputMethodManager imm = (InputMethodManager) this.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(fragmentMainBinding.reposRecyclerView.getWindowToken(), 0);
+    }
+
+    @Override
+    public void showProgressIndicator() {
+        mainViewModel.showProgress();
+    }
+
+    @Override
+    public void showRepostories(List<Repository> repositories) {
+        mainViewModel.showRecylerView();
+        RepositoryAdapter adapter = (RepositoryAdapter) fragmentMainBinding.reposRecyclerView.getAdapter();
+        adapter.setRepositories(repositories);
+        hideSoftKeyboard();
+    }
+
+    @Override
+    public void showMessage(int resId) {
+        mainViewModel.showMessage(getContext().getString(resId));
     }
 
     @Override
@@ -104,69 +89,4 @@ public class MainFragment extends Fragment implements MainContract.View {
         super.onDestroyView();
     }
 
-    private void setupRecyclerView(RecyclerView reposRecyclerView) {
-        RepositoryAdapter adapter = new RepositoryAdapter();
-        adapter.setOnItemClickListener(new RepositoryAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(Repository repository) {
-                // 跳转到详情页
-                RepositoryActivity.startActivity(MainFragment.this.getContext(), repository);
-            }
-        });
-        reposRecyclerView.setAdapter(adapter);
-        reposRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-    }
-
-    private TextWatcher mHideShowButtonTextWatcher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            buttonSearch.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-
-        }
-    };
-
-    @Override
-    public void showProgressIndicator() {
-        progress.setVisibility(View.VISIBLE);
-        textInfo.setVisibility(View.INVISIBLE);
-        reposRecyclerView.setVisibility(View.INVISIBLE);
-    }
-
-    private void hideSoftKeyboard() {
-        InputMethodManager imm = (InputMethodManager) this.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(editTextUsername.getWindowToken(), 0);
-    }
-
-    @Override
-    public void showRepostories(List<Repository> repositories) {
-        RepositoryAdapter adapter = (RepositoryAdapter) reposRecyclerView.getAdapter();
-        adapter.setRepositories(repositories);
-        reposRecyclerView.requestFocus();
-        hideSoftKeyboard();
-        progress.setVisibility(View.INVISIBLE);
-        textInfo.setVisibility(View.INVISIBLE);
-        reposRecyclerView.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void showMessage(int resId) {
-        progress.setVisibility(View.INVISIBLE);
-        textInfo.setVisibility(View.VISIBLE);
-        reposRecyclerView.setVisibility(View.INVISIBLE);
-        textInfo.setText(this.getContext().getString(resId));
-    }
-
-    @OnClick(R.id.button_search)
-    public void searchClick() {
-        mPresenter.loadGithubRepos(editTextUsername.getText().toString());
-    }
 }

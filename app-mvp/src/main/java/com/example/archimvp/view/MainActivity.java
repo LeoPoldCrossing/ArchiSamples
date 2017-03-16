@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import com.example.archimvp.R;
 import com.example.archimvp.presenter.MainPresenter;
 import com.example.archimvp.utils.ActivityUtils;
+import com.example.archimvp.viewmodel.MainViewModel;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -18,8 +19,6 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    private MainPresenter mainPresenter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,14 +28,18 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-        MainFragment mainFragment = (MainFragment)getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        MainFragment mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
         if (mainFragment == null) {
             mainFragment = MainFragment.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), mainFragment, R.id.contentFrame);
         }
 
-        mainPresenter = new MainPresenter();
+        MainPresenter mainPresenter = new MainPresenter();
         mainPresenter.attachView(mainFragment);
+
+        MainViewModel mainViewModel = new MainViewModel(this, mainPresenter);
+
+        mainFragment.setViewModel(mainViewModel);
     }
 
     @Override

@@ -23,9 +23,11 @@ public class MainPresenter implements MainContract.Presenter {
     private Subscription subscription;
     private List<Repository> mList;
 
+
     public MainPresenter(){
 
     }
+
 
     @Override
     public void attachView(MainContract.View view) {
@@ -45,7 +47,6 @@ public class MainPresenter implements MainContract.Presenter {
         if(username.isEmpty()){
             return;
         }
-        mView.showProgressIndicator();
         if (subscription != null) {
             subscription.unsubscribe();
         }
@@ -84,4 +85,5 @@ public class MainPresenter implements MainContract.Presenter {
     private static boolean isHttp404(Throwable error) {
         return error instanceof HttpException && ((HttpException) error).code() == 404;
     }
+
 }
