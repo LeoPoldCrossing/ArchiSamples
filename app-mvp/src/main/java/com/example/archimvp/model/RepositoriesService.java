@@ -14,10 +14,9 @@ import rx.Observable;
  * Created by LeoPoldCrossing on 2017/3/13.
  */
 
-public interface GitHubService {
+public interface RepositoriesService {
+    String HOST = "https://api.github.com/";
+
     @GET("users/{username}/repos")
     Observable<List<Repository>> publicRepositories(@Path("username") String username);
-
-    @GET
-    Observable<User> userFromUrl(@Url String userUrl);
 }

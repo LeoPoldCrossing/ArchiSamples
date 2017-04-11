@@ -2,20 +2,17 @@ package com.example.archimvp;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.example.archimvp.model.GitHubService;
-import com.example.archimvp.model.RetrofitHelper;
+import com.example.archimvp.di.component.AppComponent;
+import com.example.archimvp.di.component.DaggerAppComponent;
+import com.example.archimvp.di.module.AppModule;
+import com.example.archimvp.di.module.HttpModule;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-
-import rx.Scheduler;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by LeoPoldCrossing on 2017/3/13.
@@ -25,6 +22,7 @@ public class ArchiApplication extends Application {
     public static final String TAG = "ArchiApplication";
 
     private static ArchiApplication mInstance;
+    public static AppComponent appComponent;
     private static List<Activity> mActivities = Collections.synchronizedList(new LinkedList<Activity>());
     private static int activeCount;
 
@@ -220,6 +218,16 @@ public class ArchiApplication extends Application {
     private void pushActivity(Activity activity) {
         mActivities.add(activity);
         Log.e(TAG, "mActivities size" + mActivities.size());
+    }
+
+    public static AppComponent getAppComponent(){
+        if (appComponent == null) {
+            appComponent = DaggerAppComponent.builder()
+                    .appModule(new AppModule(mInstance))
+                    .httpModule(new HttpModule())
+                    .build();
+        }
+        return appComponent;
     }
 
 }

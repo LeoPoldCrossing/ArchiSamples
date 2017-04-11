@@ -8,8 +8,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.example.archimvp.ArchiApplication;
 import com.example.archimvp.R;
 import com.example.archimvp.base.BaseActivity;
+import com.example.archimvp.di.component.ActivityComponent;
+import com.example.archimvp.di.component.DaggerActivityComponent;
+import com.example.archimvp.di.module.ActivityModule;
 import com.example.archimvp.model.Repository;
 import com.example.archimvp.model.User;
 import com.example.archimvp.presenter.RepositoryPresenter;
@@ -59,10 +63,10 @@ public class RepositoryActivity extends BaseActivity<RepositoryPresenter> implem
 
     @Override
     protected void initInject() {
-        if (mPresenter == null) {
-            mPresenter = new RepositoryPresenter();
-        }
-
+//        if (mPresenter == null) {
+//            mPresenter = new RepositoryPresenter();
+//        }
+        getActivityComponent().inject(this);
     }
 
     @Override

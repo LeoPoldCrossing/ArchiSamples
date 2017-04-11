@@ -1,10 +1,11 @@
 package com.example.archimvp.presenter;
 
+import android.util.Log;
+
 import com.example.archimvp.R;
 import com.example.archimvp.base.RxPresenter;
 import com.example.archimvp.common.CommonSubscriber;
 import com.example.archimvp.common.RxBus;
-import com.example.archimvp.model.HttpResponse;
 import com.example.archimvp.model.Repository;
 import com.example.archimvp.model.RetrofitHelper;
 import com.example.archimvp.presenter.contract.MainContract;
@@ -12,8 +13,8 @@ import com.example.archimvp.utils.RxUtil;
 
 import java.util.List;
 
-import retrofit2.adapter.rxjava.HttpException;
-import rx.Subscriber;
+import javax.inject.Inject;
+
 import rx.Subscription;
 import rx.functions.Action1;
 
@@ -24,8 +25,11 @@ import rx.functions.Action1;
 public class MainPresenter extends RxPresenter<MainContract.View> implements MainContract.Presenter {
 
     private List<Repository> mList;
+    private RetrofitHelper retrofitHelper;
 
-    public MainPresenter() {
+    @Inject
+    public MainPresenter(RetrofitHelper retrofitHelper) {
+        this.retrofitHelper = retrofitHelper;
         registerEvent();
     }
 
@@ -48,7 +52,7 @@ public class MainPresenter extends RxPresenter<MainContract.View> implements Mai
             return;
         }
         mView.showProgressIndicator();
-        Subscription subscription = RetrofitHelper.shareInstance().createGithubService().publicRepositories(username)
+        Subscription subscription = retrofitHelper.getRepositories(username)
                 .compose(RxUtil.<List<Repository>>rxSchedulerHelper())
                 .subscribe(new CommonSubscriber<List<Repository>>(mView) {
                     @Override

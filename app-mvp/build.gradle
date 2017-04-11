@@ -37,5 +37,8 @@ dependencies {
     compile dependencies.fragmentation
     compile dependencies.rxpermission
     apt dependencies.apt
+    compile dependencies.dagger
+    compile dependencies.daggercompiler
+    provided 'org.glassfish:javax.annotation:10.0-b28'
 
 }

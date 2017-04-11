@@ -5,6 +5,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -58,7 +59,8 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
 
     @Override
     protected void initInject() {
-        mPresenter = new MainPresenter();
+//        mPresenter = new MainPresenter();
+        getFragmentComponent().inject(this);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.example.archimvp.common;
 
 
+import android.util.Log;
+
 import com.example.archimvp.utils.RxUtil;
 
 import rx.Observable;

@@ -9,6 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.archimvp.ArchiApplication;
+import com.example.archimvp.di.component.DaggerFragmentComponent;
+import com.example.archimvp.di.component.FragmentComponent;
+import com.example.archimvp.di.module.FragmentModule;
+
+import javax.inject.Inject;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import me.yokeyword.fragmentation.SupportFragment;
@@ -18,6 +25,7 @@ import me.yokeyword.fragmentation.SupportFragment;
  */
 
 public abstract class BaseFragment<T extends BasePresenter> extends SupportFragment implements BaseView {
+    @Inject
     public T mPresenter;
     protected View mView;
     protected Activity mActivity;
@@ -88,4 +96,11 @@ public abstract class BaseFragment<T extends BasePresenter> extends SupportFragm
     protected abstract int getLayoutId();
 
     protected abstract void initInject();
+
+    protected FragmentComponent getFragmentComponent(){
+        return DaggerFragmentComponent.builder()
+                .appComponent(ArchiApplication.getAppComponent())
+                .fragmentModule(new FragmentModule(this))
+                .build();
+    }
 }

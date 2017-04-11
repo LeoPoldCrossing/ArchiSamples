@@ -4,6 +4,13 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.example.archimvp.ArchiApplication;
+import com.example.archimvp.di.component.ActivityComponent;
+import com.example.archimvp.di.component.DaggerActivityComponent;
+import com.example.archimvp.di.module.ActivityModule;
+
+import javax.inject.Inject;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import me.yokeyword.fragmentation.SupportActivity;
@@ -14,6 +21,7 @@ import me.yokeyword.fragmentation.SupportActivity;
 
 public abstract class BaseActivity<T extends BasePresenter> extends SupportActivity implements BaseView {
 
+    @Inject
     protected T mPresenter;
     protected Activity mContext;
     private Unbinder mUnbinder;
@@ -31,6 +39,8 @@ public abstract class BaseActivity<T extends BasePresenter> extends SupportActiv
         }
         initEventAndData();
     }
+
+
 
     @Override
     protected void onResume() {
@@ -52,5 +62,12 @@ public abstract class BaseActivity<T extends BasePresenter> extends SupportActiv
     protected abstract void initInject();
 
     protected abstract void initEventAndData();
+
+    protected ActivityComponent getActivityComponent(){
+        return DaggerActivityComponent.builder()
+                .appComponent(ArchiApplication.getAppComponent())
+                .activityModule(new ActivityModule(this))
+                .build();
+    }
 
 }

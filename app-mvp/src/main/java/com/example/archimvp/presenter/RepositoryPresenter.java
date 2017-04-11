@@ -1,18 +1,16 @@
 package com.example.archimvp.presenter;
 
-import com.example.archimvp.ArchiApplication;
 import com.example.archimvp.base.RxPresenter;
 import com.example.archimvp.common.CommonSubscriber;
-import com.example.archimvp.model.GitHubService;
 import com.example.archimvp.model.Repository;
 import com.example.archimvp.model.RetrofitHelper;
 import com.example.archimvp.model.User;
 import com.example.archimvp.presenter.contract.RepositoryContract;
 import com.example.archimvp.utils.RxUtil;
 
+import javax.inject.Inject;
+
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 
 /**
  * Created by LeoPoldCrossing on 2017/3/14.
@@ -20,8 +18,11 @@ import rx.functions.Action1;
 
 public class RepositoryPresenter extends RxPresenter<RepositoryContract.View> implements RepositoryContract.Presenter {
     private User user;
+    private RetrofitHelper retrofitHelper;
 
-    public RepositoryPresenter(){
+     @Inject
+    public RepositoryPresenter(RetrofitHelper retrofitHelper){
+         this.retrofitHelper = retrofitHelper;
     }
 
 
@@ -32,9 +33,7 @@ public class RepositoryPresenter extends RxPresenter<RepositoryContract.View> im
 
     @Override
     public void loadUserInfo(String userUrl) {
-        Subscription subscription = RetrofitHelper.shareInstance()
-                .createGithubService()
-                .userFromUrl(userUrl)
+        Subscription subscription = retrofitHelper.getUserInfo(userUrl)
                 .compose(RxUtil.<User>rxSchedulerHelper())
                 .subscribe(new CommonSubscriber<User>(mView) {
                     @Override
