@@ -1,9 +1,7 @@
 package com.example.archimvp.model;
 
-import java.util.List;
 
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 import retrofit2.http.Url;
 import rx.Observable;
 

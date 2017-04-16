@@ -3,6 +3,7 @@ package com.example.archimvp.view;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -18,6 +19,9 @@ import com.example.archimvp.model.Repository;
 import com.example.archimvp.model.User;
 import com.example.archimvp.presenter.RepositoryPresenter;
 import com.example.archimvp.presenter.contract.RepositoryContract;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;

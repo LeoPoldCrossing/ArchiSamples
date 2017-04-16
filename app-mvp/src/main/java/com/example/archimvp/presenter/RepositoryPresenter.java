@@ -20,7 +20,7 @@ public class RepositoryPresenter extends RxPresenter<RepositoryContract.View> im
     private User user;
     private RetrofitHelper retrofitHelper;
 
-     @Inject
+    @Inject
     public RepositoryPresenter(RetrofitHelper retrofitHelper){
          this.retrofitHelper = retrofitHelper;
     }
@@ -34,7 +34,6 @@ public class RepositoryPresenter extends RxPresenter<RepositoryContract.View> im
     @Override
     public void loadUserInfo(String userUrl) {
         Subscription subscription = retrofitHelper.getUserInfo(userUrl)
-                .compose(RxUtil.<User>rxSchedulerHelper())
                 .subscribe(new CommonSubscriber<User>(mView) {
                     @Override
                     public void onNext(User user) {
@@ -45,6 +44,12 @@ public class RepositoryPresenter extends RxPresenter<RepositoryContract.View> im
                     public void onCompleted() {
                         super.onCompleted();
                         mView.showUserInfo(user);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        super.onError(e);
                     }
                 });
         addSubscribe(subscription);

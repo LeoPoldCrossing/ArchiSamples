@@ -23,7 +23,18 @@ import com.example.archimvp.common.RxBus;
 import com.example.archimvp.model.Repository;
 import com.example.archimvp.presenter.MainPresenter;
 import com.example.archimvp.presenter.contract.MainContract;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 import butterknife.BindView;
@@ -87,7 +98,32 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
         adapter.setOnItemClickListener(new RepositoryAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Repository repository) {
+                JsonSerializer<Number> jsonSerializer = new JsonSerializer<Number>() {
+                    @Override
+                    public JsonElement serialize(Number src, Type typeOfSrc, JsonSerializationContext context) {
+                        return new JsonPrimitive(String.valueOf(src));
+                    }
+                };
                 // 跳转到详情页
+                Gson gson = new GsonBuilder()
+                        .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
+                        .registerTypeAdapter(Integer.class, jsonSerializer)
+                        .registerTypeAdapter(Double.class, jsonSerializer)
+                        .registerTypeAdapter(Long.class, jsonSerializer)
+                        .registerTypeAdapter(Float.class, jsonSerializer)
+                        .registerTypeAdapter(Double.class, new JsonDeserializer<Double>() {
+                            @Override
+                            public Double deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                                try {
+                                    return json.getAsDouble();
+                                } catch (NumberFormatException e) {
+                                    return -1.0;
+                                }
+
+                            }
+                        })
+                        .create();
+                Log.e("GsonDemo", gson.toJson(repository));
                 RepositoryActivity.startActivity(MainFragment.this.getContext(), repository);
             }
         });

@@ -15,6 +15,8 @@ public class HttpResponse<T> {
         return message;
     }
 
+    private T data;
+
     public void setMessage(MessageBean message) {
         this.message = message;
     }

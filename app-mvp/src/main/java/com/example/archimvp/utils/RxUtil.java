@@ -36,15 +36,16 @@ public class RxUtil {
 
             @Override
             public Observable<T> call(Observable<HttpResponse<T>> httpResponseObservable) {
-                return httpResponseObservable.flatMap(new Func1<HttpResponse<T>, Observable<T>>() {
-                    @Override
-                    public Observable<T> call(HttpResponse<T> tHttpResponse) {
-                        if(tHttpResponse.getMessage().getCode() != 0) {
-                            return Observable.error(new APIException(tHttpResponse.getMessage().getMessage()));
-                        }else{
-                            return (Observable<T>) createData(tHttpResponse);
-                        }
-                    }
+                return httpResponseObservable.compose(RxUtil.<HttpResponse<T>>rxSchedulerHelper())
+                        .flatMap(new Func1<HttpResponse<T>, Observable<T>>() {
+                            @Override
+                            public Observable<T> call(HttpResponse<T> tHttpResponse) {
+                                if(tHttpResponse.getMessage().getCode() != 0) {
+                                    return Observable.error(new APIException(tHttpResponse.getMessage().getMessage()));
+                                }else{
+                                    return (Observable<T>) createData(tHttpResponse);
+                                }
+                            }
                 });
             }
         };

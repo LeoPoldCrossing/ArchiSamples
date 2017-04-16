@@ -11,6 +11,7 @@ import rx.Observable;
  * Created by LeoPoldCrossing on 2017/3/13.
  */
 
+//todo 省略这一层
 public class RetrofitHelper {
     private RepositoriesService repositoriesService;
     private UserInfoService userInfoService;
@@ -20,6 +21,9 @@ public class RetrofitHelper {
         this.userInfoService = userInfoService;
     }
 
+    /**
+    *
+    * */
     public Observable<List<Repository>> getRepositories(String userName){
         return repositoriesService.publicRepositories(userName);
     }
@@ -27,13 +31,4 @@ public class RetrofitHelper {
     public Observable<User> getUserInfo(String url){
         return userInfoService.userFromUrl(url);
     }
-
-    private Retrofit createRetrofit(String url){
-        return new Retrofit.Builder()
-                .baseUrl(url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .build();
-    }
-
 }

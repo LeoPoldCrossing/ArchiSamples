@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import com.example.archimvp.di.module.ActivityModule;
 import com.example.archimvp.di.scope.ActivityScope;
+import com.example.archimvp.view.MainActivity;
 import com.example.archimvp.view.RepositoryActivity;
 
 import dagger.Component;
@@ -18,4 +19,8 @@ public interface ActivityComponent {
     Activity getActivity();
 
     void inject(RepositoryActivity repositoryActivity);
+
+    void inject(MainActivity mainActivity);
+
+
 }
