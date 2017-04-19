@@ -1,44 +1,21 @@
 package com.example.archimvp.view;
 
-import android.content.Context;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.archimvp.R;
-import com.example.archimvp.adapter.RepositoryAdapter;
+import com.example.archimvp.adapter.WechatAdapter;
 import com.example.archimvp.base.BaseFragment;
-import com.example.archimvp.common.RxBus;
-import com.example.archimvp.model.Repository;
+import com.example.archimvp.model.WxItemBean;
 import com.example.archimvp.presenter.MainPresenter;
 import com.example.archimvp.presenter.contract.MainContract;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 
-import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.OnClick;
 
 /**
  * Created by LeoPoldCrossing on 2017/3/14.
@@ -46,18 +23,18 @@ import butterknife.OnClick;
 
 public class MainFragment extends BaseFragment<MainPresenter> implements MainContract.View {
 
-    @BindView(R.id.button_search)
-    ImageButton buttonSearch;
-    @BindView(R.id.edit_text_username)
-    EditText editTextUsername;
-    @BindView(R.id.layout_search)
-    RelativeLayout layoutSearch;
-    @BindView(R.id.progress)
-    ProgressBar progress;
-    @BindView(R.id.text_info)
-    TextView textInfo;
-    @BindView(R.id.repos_recycler_view)
-    RecyclerView reposRecyclerView;
+
+    @BindView(R.id.rv_content)
+    RecyclerView rvWechatList;
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout swipeRefresh;
+    @BindView(R.id.iv_progress)
+    ProgressImageView ivProgress;
+
+    WechatAdapter mAdapter;
+    List<WxItemBean> mList;
+
+    boolean isLoadingMore = false;
 
     public static MainFragment newInstance() {
         return new MainFragment();
@@ -76,117 +53,62 @@ public class MainFragment extends BaseFragment<MainPresenter> implements MainCon
 
     @Override
     protected void initEventAndData() {
-        setupRecyclerView(reposRecyclerView);
-        editTextUsername.addTextChangedListener(mHideShowButtonTextWatcher);
-        // 该监听器在点击键盘的回车键时触发
-        editTextUsername.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mList = new ArrayList<>();
+        mAdapter = new WechatAdapter(mContext,mList);
+        rvWechatList.setLayoutManager(new LinearLayoutManager(mContext));
+        rvWechatList.setAdapter(mAdapter);
+        rvWechatList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    String username = editTextUsername.getText().toString();
-                    if (username.length() > 0)
-                        RxBus.getDefault().post(username);
-                    return true;
-                }
-                return false;
-            }
-        });
-    }
-
-    private void setupRecyclerView(RecyclerView reposRecyclerView) {
-        RepositoryAdapter adapter = new RepositoryAdapter();
-        adapter.setOnItemClickListener(new RepositoryAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(Repository repository) {
-                JsonSerializer<Number> jsonSerializer = new JsonSerializer<Number>() {
-                    @Override
-                    public JsonElement serialize(Number src, Type typeOfSrc, JsonSerializationContext context) {
-                        return new JsonPrimitive(String.valueOf(src));
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int lastVisibleItem = ((LinearLayoutManager) rvWechatList.getLayoutManager()).findLastVisibleItemPosition();
+                int totalItemCount = rvWechatList.getLayoutManager().getItemCount();
+                if (lastVisibleItem >= totalItemCount - 2 && dy > 0) {  //还剩2个Item时加载更多
+                    if(!isLoadingMore){
+                        isLoadingMore = true;
+                        mPresenter.getMoreWechatData();
                     }
-                };
-                // 跳转到详情页
-                Gson gson = new GsonBuilder()
-                        .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-                        .registerTypeAdapter(Integer.class, jsonSerializer)
-                        .registerTypeAdapter(Double.class, jsonSerializer)
-                        .registerTypeAdapter(Long.class, jsonSerializer)
-                        .registerTypeAdapter(Float.class, jsonSerializer)
-                        .registerTypeAdapter(Double.class, new JsonDeserializer<Double>() {
-                            @Override
-                            public Double deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-                                try {
-                                    return json.getAsDouble();
-                                } catch (NumberFormatException e) {
-                                    return -1.0;
-                                }
-
-                            }
-                        })
-                        .create();
-                Log.e("GsonDemo", gson.toJson(repository));
-                RepositoryActivity.startActivity(MainFragment.this.getContext(), repository);
+                }
             }
         });
-        reposRecyclerView.setAdapter(adapter);
-        reposRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-    }
-
-    private TextWatcher mHideShowButtonTextWatcher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            buttonSearch.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-
-        }
-    };
-
-    @Override
-    public void showProgressIndicator() {
-        progress.setVisibility(View.VISIBLE);
-        textInfo.setVisibility(View.INVISIBLE);
-        reposRecyclerView.setVisibility(View.INVISIBLE);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mPresenter.getWechatData();
+            }
+        });
+        ivProgress.start();
+        mPresenter.getWechatData();
     }
 
     @Override
-    public void showRepostories(List<Repository> repositories) {
-        RepositoryAdapter adapter = (RepositoryAdapter) reposRecyclerView.getAdapter();
-        adapter.setRepositories(repositories);
-        reposRecyclerView.requestFocus();
-        hideSoftKeyboard();
-        progress.setVisibility(View.INVISIBLE);
-        textInfo.setVisibility(View.INVISIBLE);
-        reposRecyclerView.setVisibility(View.VISIBLE);
+    public void showContent(List<WxItemBean> list) {
+        if(swipeRefresh.isRefreshing()) {
+            swipeRefresh.setRefreshing(false);
+        } else {
+            ivProgress.stop();
+        }
+        mList.clear();
+        mList.addAll(list);
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public void showMessage(int resId) {
-        progress.setVisibility(View.INVISIBLE);
-        textInfo.setVisibility(View.VISIBLE);
-        reposRecyclerView.setVisibility(View.INVISIBLE);
-        textInfo.setText(this.getContext().getString(resId));
+    public void showMoreContent(List<WxItemBean> list) {
+        ivProgress.stop();
+        mList.addAll(list);
+        mAdapter.notifyDataSetChanged();
+        isLoadingMore = false;
     }
 
-    @OnClick(R.id.button_search)
-    public void searchClick() {
-        RxBus.getDefault().post(editTextUsername.getText().toString());
-    }
 
     @Override
     public void showErrorMsg(String msg) {
-
+        if(swipeRefresh.isRefreshing()) {
+            swipeRefresh.setRefreshing(false);
+        } else {
+            ivProgress.stop();
+        }
+        Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
     }
-
-    private void hideSoftKeyboard() {
-        InputMethodManager imm = (InputMethodManager) this.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(editTextUsername.getWindowToken(), 0);
-    }
-
 }

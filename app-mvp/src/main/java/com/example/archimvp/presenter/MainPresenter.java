@@ -1,13 +1,10 @@
 package com.example.archimvp.presenter;
 
-import android.util.Log;
-
-import com.example.archimvp.R;
 import com.example.archimvp.base.RxPresenter;
 import com.example.archimvp.common.CommonSubscriber;
-import com.example.archimvp.common.RxBus;
-import com.example.archimvp.model.Repository;
+import com.example.archimvp.model.HttpResponse;
 import com.example.archimvp.model.RetrofitHelper;
+import com.example.archimvp.model.WxItemBean;
 import com.example.archimvp.presenter.contract.MainContract;
 import com.example.archimvp.utils.RxUtil;
 
@@ -15,60 +12,53 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import rx.Observable;
 import rx.Subscription;
-import rx.functions.Action1;
 
 /**
  * Created by LeoPoldCrossing on 2017/3/14.
  */
 
 public class MainPresenter extends RxPresenter<MainContract.View> implements MainContract.Presenter {
+    private static final int NUM_OF_PAGE = 20;
 
-    private List<Repository> mList;
-    private RetrofitHelper retrofitHelper;
+    private int currentPage = 1;
+
+    private RetrofitHelper mRetrofitHelper;
 
     @Inject
-    public MainPresenter(RetrofitHelper retrofitHelper) {
-        this.retrofitHelper = retrofitHelper;
-        registerEvent();
-    }
-
-    private void registerEvent() {
-        Subscription subscription = RxBus.getDefault().tObservable(String.class)
-                .compose(RxUtil.<String>rxSchedulerHelper())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        loadGithubRepos(s);
-                    }
-                });
-        addSubscribe(subscription);
+    public MainPresenter(RetrofitHelper mRetrofitHelper) {
+        this.mRetrofitHelper = mRetrofitHelper;
     }
 
     @Override
-    public void loadGithubRepos(String usernameEntered) {
-        String username = usernameEntered.trim();
-        if (username.isEmpty()) {
-            return;
-        }
-        mView.showProgressIndicator();
-        Subscription subscription = retrofitHelper.getRepositories(username)
-                .compose(RxUtil.<List<Repository>>rxSchedulerHelper())
-                .subscribe(new CommonSubscriber<List<Repository>>(mView) {
+    public void getWechatData() {
+        currentPage = 1;
+        Subscription rxSubscription = mRetrofitHelper.fetchWechatListInfo(NUM_OF_PAGE, currentPage)
+                .compose(RxUtil.<HttpResponse<List<WxItemBean>>>rxSchedulerHelper())
+                .compose(RxUtil.<List<WxItemBean>>handleResult())
+                .subscribe(new CommonSubscriber<List<WxItemBean>>(mView) {
                     @Override
-                    public void onCompleted() {
-                        if (mList.isEmpty()) {
-                            mView.showMessage(R.string.text_empty_repos);
-                        } else {
-                            mView.showRepostories(mList);
-                        }
-                    }
-
-                    @Override
-                    public void onNext(List<Repository> repositories) {
-                        MainPresenter.this.mList = repositories;
+                    public void onNext(List<WxItemBean> wxItemBeen) {
+                        mView.showContent(wxItemBeen);
                     }
                 });
-        addSubscribe(subscription);
+        addSubscribe(rxSubscription);
+    }
+
+    @Override
+    public void getMoreWechatData() {
+        Observable<HttpResponse<List<WxItemBean>>> observable;
+        observable = mRetrofitHelper.fetchWechatListInfo(NUM_OF_PAGE, ++currentPage);
+        Subscription rxSubscription = observable
+                .compose(RxUtil.<HttpResponse<List<WxItemBean>>>rxSchedulerHelper())
+                .compose(RxUtil.<List<WxItemBean>>handleResult())
+                .subscribe(new CommonSubscriber<List<WxItemBean>>(mView, "没有更多了ヽ(≧Д≦)ノ") {
+                    @Override
+                    public void onNext(List<WxItemBean> wxItemBeen) {
+                        mView.showMoreContent(wxItemBeen);
+                    }
+                });
+        addSubscribe(rxSubscription);
     }
 }

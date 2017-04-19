@@ -21,11 +21,9 @@ public class RetrofitHelper {
         this.userInfoService = userInfoService;
     }
 
-    /**
-    *
-    * */
-    public Observable<List<Repository>> getRepositories(String userName){
-        return repositoriesService.publicRepositories(userName);
+
+    public Observable<HttpResponse<List<WxItemBean>>> fetchWechatListInfo(int num, int page) {
+        return repositoriesService.getWXHot("52b7ec3471ac3bec6846577e79f20e4c", num, page);
     }
 
     public Observable<User> getUserInfo(String url){

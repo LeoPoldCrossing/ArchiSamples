@@ -7,6 +7,7 @@ import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 import retrofit2.http.Url;
 import rx.Observable;
 
@@ -15,8 +16,12 @@ import rx.Observable;
  */
 
 public interface RepositoriesService {
-    String HOST = "https://api.github.com/";
 
-    @GET("users/{username}/repos")
-    Observable<List<Repository>> publicRepositories(@Path("username") String username);
+    String HOST = "http://api.tianapi.com/";
+
+    /**
+     * 微信精选列表
+     */
+    @GET("wxnew")
+    Observable<HttpResponse<List<WxItemBean>>> getWXHot(@Query("key") String key, @Query("num") int num, @Query("page") int page);
 }

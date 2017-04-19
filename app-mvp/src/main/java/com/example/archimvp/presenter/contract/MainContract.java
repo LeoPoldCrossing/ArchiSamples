@@ -3,6 +3,7 @@ package com.example.archimvp.presenter.contract;
 import com.example.archimvp.base.BasePresenter;
 import com.example.archimvp.base.BaseView;
 import com.example.archimvp.model.Repository;
+import com.example.archimvp.model.WxItemBean;
 
 import java.util.List;
 
@@ -11,15 +12,17 @@ import java.util.List;
  */
 
 public class MainContract {
-    public interface View extends BaseView{
-        void showProgressIndicator();
+    public interface View extends BaseView {
 
-        void showRepostories(List<Repository> repositories);
+        void showContent(List<WxItemBean> mList);
 
-        void showMessage(int resId);
+        void showMoreContent(List<WxItemBean> mList);
     }
 
-    public interface Presenter extends BasePresenter<View>{
-        void loadGithubRepos(String username);
+    public interface Presenter extends BasePresenter<View> {
+
+        void getWechatData();
+
+        void getMoreWechatData();
     }
 }
